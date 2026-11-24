@@ -1,0 +1,192 @@
+/* =====================================================================
+   سامانه مشاور اعتباری بانک شهر — ارتقای رابط کاربری، حالت تاریک و ماژول‌های نسخه ۳٫۹
+   ===================================================================== */
+
+/* ---------- AppBar Quick Actions ---------- */
+.appbar-actions{display:flex;align-items:center;gap:7px;flex:none}
+.ab-tool{height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.12);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 10px;cursor:pointer;font-size:12px;font-weight:700;transition:background .15s,border-color .15s}
+.ab-tool:hover{background:rgba(255,255,255,.22);border-color:rgba(229,199,127,.75)}
+.ab-tool.icon-only{width:38px;padding:0}
+.ab-tool kbd{font-family:inherit;font-size:10px;padding:0 5px;border-radius:5px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.18);direction:ltr;unicode-bidi:isolate}
+@media(max-width:899.98px){
+  .ab-tool span.lbl,.ab-tool kbd{display:none}
+  .ab-tool{width:36px;height:36px;padding:0}
+}
+
+/* ---------- Command Palette (جستجوی سراسری) ---------- */
+.cmd-backdrop{position:fixed;inset:0;z-index:200;background:rgba(12,17,28,.62);backdrop-filter:blur(5px);display:none;align-items:flex-start;justify-content:center;padding:64px 16px 24px}
+.cmd-backdrop.open{display:flex;animation:fi .16s ease}
+.cmd-box{width:100%;max-width:640px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 28px 70px -20px rgba(0,0,0,.55);overflow:hidden;display:flex;flex-direction:column;max-height:min(580px,82vh)}
+.cmd-head{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}
+.cmd-head svg{color:var(--brand);flex:none}
+.cmd-head input{flex:1;border:0;outline:none;background:transparent;font-size:14px;color:var(--ink)}
+.cmd-head kbd{font-family:inherit;font-size:10.5px;color:var(--ink3);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.cmd-list{overflow-y:auto;padding:8px;flex:1}
+.cmd-grp{font-size:10.5px;font-weight:800;color:var(--ink3);padding:8px 10px 4px}
+.cmd-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:11px;cursor:pointer;transition:background .12s}
+.cmd-item:hover,.cmd-item.sel{background:var(--line2)}
+.cmd-item.sel{outline:1.5px solid var(--brand)}
+.cmd-ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;flex:none;background:var(--navy)}
+.cmd-item .grow{min-width:0;flex:1}
+.cmd-item b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmd-item small{display:block;font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmd-badge{font-size:10px;padding:1px 7px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--ink2);flex:none}
+.cmd-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--ink3);background:var(--bg)}
+.cmd-empty{text-align:center;padding:34px 16px;color:var(--ink3);font-size:13px}
+
+/* ---------- Cases Toolbar ---------- */
+.cases-bar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
+.cases-bar-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cases-bar .search{margin:0;flex:1;min-width:210px}
+.cases-actions{display:flex;flex-wrap:wrap;gap:7px}
+.cases-actions .btn{padding:8px 12px;font-size:12px}
+.cases-meta{font-size:11.5px;color:var(--ink3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+
+/* ---------- Product Comparator ---------- */
+.cmp-pickers{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:12px}
+.cmp-slot{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.cmp-slot label{display:block;font-size:11px;font-weight:800;color:var(--ink3);margin-bottom:5px}
+.cmp-table-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.cmp-table{width:100%;min-width:640px;border-collapse:collapse;font-size:12px}
+.cmp-table th{background:var(--navy);color:#fff;padding:10px 10px;text-align:right;vertical-align:top;min-width:160px}
+.cmp-table th:first-child{min-width:130px;width:135px;background:var(--navy2)}
+.cmp-table td{padding:9px 10px;border-bottom:1px solid var(--line2);border-left:1px solid var(--line2);vertical-align:top;line-height:1.8}
+.cmp-table td:first-child{font-weight:800;color:var(--navy);background:var(--bg)}
+.cmp-table tr:last-child td{border-bottom:0}
+.cmp-ul{margin:0;padding:0 16px 0 0;font-size:11.5px}.cmp-ul li{margin-bottom:3px}
+
+/* ---------- DSCR Gauge & Chart ---------- */
+.dscr-meter{height:12px;border-radius:99px;background:var(--line2);overflow:hidden;margin:10px 0 6px;position:relative}
+.dscr-meter i{display:block;height:100%;border-radius:99px;transition:width .3s ease}
+.dscr-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:11.5px;font-weight:800}
+.dscr-pill.ok{background:var(--okb);color:var(--ok)}
+.dscr-pill.warn{background:var(--warnb);color:var(--warn)}
+.dscr-pill.bad{background:var(--badb);color:var(--bad)}
+
+/* ---------- Scroll to Top ---------- */
+.scroll-top{position:fixed;left:24px;bottom:88px;z-index:24;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--navy);box-shadow:0 8px 22px -10px rgba(0,0,0,.35);display:none;place-items:center;cursor:pointer;transition:transform .15s,opacity .15s}
+.scroll-top.on{display:grid}
+.scroll-top:hover{transform:translateY(-2px);border-color:var(--brand);color:var(--brand)}
+@media(min-width:900px){body.pc .scroll-top{bottom:26px}}
+
+/* ---------- Full Backup Box ---------- */
+.bkp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}
+.bkp-stat{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:8px 10px;text-align:center}
+.bkp-stat b{display:block;font-size:15px;color:var(--navy);font-weight:800}
+.bkp-stat small{font-size:10.5px;color:var(--ink3)}
+
+/* =====================================================================
+   DARK MODE (حالت تاریک)
+   ===================================================================== */
+html[data-theme="dark"]{
+  --bg:#0E131D;
+  --card:#161E2E;
+  --line:#273249;
+  --line2:#1E273B;
+  --ink:#E8EEF8;
+  --ink2:#B2BED3;
+  --ink3:#7D8BA5;
+  --okb:#113124;
+  --warnb:#36250B;
+  --badb:#3B141E;
+  --infob:#12293F;
+}
+html[data-theme="dark"] body{background:#090D16;color:var(--ink)}
+html[data-theme="dark"] body.pc{background:#0B101A}
+html[data-theme="dark"] body.pc .app{background:var(--bg)}
+html[data-theme="dark"] body.pc .screen::-webkit-scrollbar-thumb{background:#32405C;border-color:var(--bg)}
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .fsec,
+html[data-theme="dark"] .prow,
+html[data-theme="dark"] .tile,
+html[data-theme="dark"] .kp,
+html[data-theme="dark"] .doc,
+html[data-theme="dark"] .search,
+html[data-theme="dark"] .chip,
+html[data-theme="dark"] .ib,
+html[data-theme="dark"] .kc,
+html[data-theme="dark"] .rcard,
+html[data-theme="dark"] .gcard,
+html[data-theme="dark"] .gcap,
+html[data-theme="dark"] .gk div,
+html[data-theme="dark"] .nba,
+html[data-theme="dark"] .chartbox,
+html[data-theme="dark"] .res.empty-r,
+html[data-theme="dark"] .sm-card,
+html[data-theme="dark"] .sm-alt,
+html[data-theme="dark"] .sm-task,
+html[data-theme="dark"] .sm-kpis div,
+html[data-theme="dark"] .sm-opt,
+html[data-theme="dark"] .sm-b.bot,
+html[data-theme="dark"] .sm-reply span,
+html[data-theme="dark"] .sm-actions span,
+html[data-theme="dark"] .lockc,
+html[data-theme="dark"] .regbar div{
+  background:var(--card);border-color:var(--line);color:var(--ink);
+}
+html[data-theme="dark"] .inp,
+html[data-theme="dark"] select.inp,
+html[data-theme="dark"] .qa textarea,
+html[data-theme="dark"] .sm-ask input,
+html[data-theme="dark"] .tb.smc input,
+html[data-theme="dark"] .tb.smc select{
+  background:#111827;border-color:var(--line);color:var(--ink);
+}
+html[data-theme="dark"] .opt{background:#111827;border-color:var(--line);color:var(--ink2)}
+html[data-theme="dark"] .opt.on{background:rgba(165,15,30,.22);border-color:var(--brand);color:#fff}
+html[data-theme="dark"] .btn.ghost{background:#1B2438;border-color:var(--line);color:var(--ink)}
+html[data-theme="dark"] .btn.ghost:hover{background:#232F48}
+html[data-theme="dark"] .nav{background:#121928;border-top-color:var(--line)}
+html[data-theme="dark"] .rbar{background:rgba(18,25,40,.94);border-color:var(--line)}
+html[data-theme="dark"] .rbar button{background:#1B2438;border-color:var(--line);color:var(--ink)}
+html[data-theme="dark"] .rbar button.p{background:var(--brand);border-color:var(--brand);color:#fff}
+html[data-theme="dark"] table.meta td:nth-child(odd){background:#1B2438;color:var(--ink2)}
+html[data-theme="dark"] table.meta td{border-color:var(--line)}
+html[data-theme="dark"] table.tb td{border-bottom-color:var(--line2)}
+html[data-theme="dark"] table.tb tr:nth-child(even) td{background:#121927}
+html[data-theme="dark"] .pick{background:linear-gradient(180deg,#1B2335,#161E2E);border-color:var(--line)}
+html[data-theme="dark"] .score{background:#111827}
+html[data-theme="dark"] .score b{color:var(--gold2)}
+html[data-theme="dark"] .sub,
+html[data-theme="dark"] .gt,
+html[data-theme="dark"] .kc b,
+html[data-theme="dark"] .regbar b,
+html[data-theme="dark"] .hb-h em,
+html[data-theme="dark"] .dm b,
+html[data-theme="dark"] .cmp-table td:first-child,
+html[data-theme="dark"] .bkp-stat b{color:var(--ink)}
+html[data-theme="dark"] .pitch{background:#1B212E;border-color:#4A3E24;color:#E8DFC8}
+html[data-theme="dark"] .quote{background:#1B2438;color:var(--ink2)}
+html[data-theme="dark"] .chk .no,
+html[data-theme="dark"] .drow .no,
+html[data-theme="dark"] .gk div span{background:#243049;color:var(--ink)}
+html[data-theme="dark"] .hb-track,
+html[data-theme="dark"] .dm i,
+html[data-theme="dark"] .gc-t,
+html[data-theme="dark"] .mini-m{background:#243049}
+html[data-theme="dark"] .sm-kv div,
+html[data-theme="dark"] .pp-pick,
+html[data-theme="dark"] .rc-a button,
+html[data-theme="dark"] .sm-task .ib2{background:#1B2438;border-color:var(--line);color:var(--ink2)}
+html[data-theme="dark"] .sm-ring i{background:var(--card);color:var(--ink)}
+html[data-theme="dark"] .sm-flash{background:linear-gradient(135deg,#211A36,#27201B);border-color:#3F3263}
+html[data-theme="dark"] .sm-flash .a{color:#C9A7FF}
+html[data-theme="dark"] .gq{background:var(--card);border-color:var(--line)}
+html[data-theme="dark"] .tag{background:#1E273B;border-color:var(--line);color:var(--ink2)}
+html[data-theme="dark"] .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+html[data-theme="dark"] .note.ok{color:#86EFAC;border-color:#1E5C3E}
+html[data-theme="dark"] .note.info{color:#93C5FD;border-color:#1F4A73}
+html[data-theme="dark"] .note.warn{color:#FCD34D;border-color:#6B4D14}
+html[data-theme="dark"] .note.bad{color:#FCA5A5;border-color:#6B1D2B}
+html[data-theme="dark"] .scroll-top{background:var(--card);border-color:var(--line);color:var(--ink)}
+html[data-theme="dark"] .sw span{background:#32405C}
+html[data-theme="dark"] .lrow{border-bottom-color:var(--line2)}
+html[data-theme="dark"] .lic{background:#1F283B;color:var(--ink2)}
+
+/* ---------- Always print light on paper ---------- */
+@media print{
+  html[data-theme="dark"]{
+    --bg:#fff;--card:#fff;--line:#E2E5EB;--line2:#EEF0F4;--ink:#161B26;--ink2:#4B5563;--ink3:#8A93A3;
+  }
+  .appbar-actions,.cmd-backdrop,.cases-bar,.scroll-top,.cmp-pickers{display:none!important}
+}
