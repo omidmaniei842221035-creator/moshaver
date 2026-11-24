@@ -1,4 +1,4 @@
-const C='shahr-advisor-pc-v39';
+const C='shahr-advisor-pc-v39b';
 const ASSETS=[
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS=[
   './icon.svg',
   './css/enhancements.css',
   './js/enhancements.js',
+  './js/super-pdf-advisor.js',
   './lib/pdf.min.js',
   './lib/pdf.worker.min.js',
   './lib/ocr-core.js',

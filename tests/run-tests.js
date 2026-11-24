@@ -8,6 +8,7 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const enh = require(path.join(ROOT, 'js', 'enhancements.js'));
+const superPdf = require(path.join(ROOT, 'js', 'super-pdf-advisor.js'));
 
 let passed = 0;
 let failed = 0;
@@ -33,6 +34,7 @@ test('All required offline assets and lib/ files exist', () => {
     'icon.svg',
     'css/enhancements.css',
     'js/enhancements.js',
+    'js/super-pdf-advisor.js',
     'lib/pdf.min.js',
     'lib/pdf.worker.min.js',
     'lib/ocr-core.js',
@@ -52,6 +54,7 @@ test('index.html references enhancements CSS/JS and lib/ paths cleanly', () => {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   assert.ok(html.includes('href="css/enhancements.css"'), 'index.html missing css/enhancements.css');
   assert.ok(html.includes('src="js/enhancements.js"'), 'index.html missing js/enhancements.js');
+  assert.ok(html.includes('src="js/super-pdf-advisor.js"'), 'index.html missing js/super-pdf-advisor.js');
   assert.ok(html.includes("lib/pdf.min.js"), 'index.html missing lib/pdf.min.js');
   assert.ok(html.includes("lib/pdf.worker.min.js"), 'index.html missing lib/pdf.worker.min.js');
   assert.ok(html.includes("lib/ocr-core.js"), 'index.html missing lib/ocr-core.js');
@@ -64,6 +67,7 @@ test('sw.js precaches all offline assets including enhancements and lib/', () =>
     './index.html',
     './css/enhancements.css',
     './js/enhancements.js',
+    './js/super-pdf-advisor.js',
     './lib/pdf.min.js',
     './lib/pdf.worker.min.js',
     './lib/ocr-core.js',
@@ -294,6 +298,108 @@ test('enhancements.js boots cleanly against mocked browser DOM & app globals', (
   sandbox.openTool('prod_compare');
   assert.strictEqual(sandbox.TOOL, 'prod_compare');
   assert.ok(elements.toolBody.innerHTML.includes('مقایسه هم‌زمان طرح‌ها'), 'prod_compare should render comparator UI');
+
+  const spCode = fs.readFileSync(path.join(ROOT, 'js', 'super-pdf-advisor.js'), 'utf8');
+  sandbox.SM_TOOLS = [{ g: 'مشاوره', items: [] }];
+  sandbox.SM_FN = {};
+  sandbox.URL = { createObjectURL: () => 'blob:1', revokeObjectURL() {} };
+  sandbox.Blob = function () {};
+  vm.runInNewContext(spCode, sandbox, { filename: 'js/super-pdf-advisor.js' });
+  assert.ok(sandbox.TOOLS.some(t => t.id === 'super_pdf'), 'super_pdf should be registered in TOOLS');
+  sandbox.openTool('super_pdf');
+  assert.strictEqual(sandbox.TOOL, 'super_pdf');
+  assert.ok(elements.toolBody.innerHTML.includes('سوپر موتور تحلیلگر PDF'), 'super_pdf should render UI');
+  sandbox.__spLoadSample();
+  assert.ok(elements.toolBody.innerHTML.includes('طرح رشد پایدار'), 'sample circular report should render');
+  sandbox.__spSwitchTab('advisor');
+  assert.ok(elements.toolBody.innerHTML.includes('گفتگوی هوشمند با بخشنامه'), 'advisor tab should render');
+});
+
+/* 4. Super PDF Circular Analyzer & Super Smart Advisor Tests */
+test('analyzeSuperCircular extracts metadata, pages, 6 insights, actions and rules', () => {
+  const a = superPdf.analyzeSuperCircular(superPdf.SAMPLE_CIRCULAR_TEXT, {
+    P: [{ id: 'wc', t: 'تسهیلات سرمایه در گردش', cats: ['wc', 'fac'], src: 'ضوابط' }],
+    DOCS2: [{ id: 'd1', title: 'ضوابط عمومی', no: '1404/100' }],
+    CP_DEF: { maxRate: { l: 'نرخ' }, branchAuth: { l: 'اختیار شعبه' } },
+    pv: k => (k === 'maxRate' ? 23 : 15)
+  });
+
+  assert.strictEqual(a.pageCount, 2);
+  assert.ok(a.meta.title.includes('طرح رشد پایدار'));
+  assert.strictEqual(a.meta.no, '1405/324/810');
+  assert.strictEqual(a.meta.date, '1405/07/18');
+  assert.strictEqual(a.meta.expire, '1405/12/29');
+  assert.strictEqual(a.meta.issuer, 'مدیریت امور اعتبارات بانک شهر');
+  assert.ok(a.clauses.length >= 8, 'Expected >=8 segmented clauses');
+  assert.ok(a.insights.limits.length >= 2);
+  assert.ok(a.insights.rates.length >= 1);
+  assert.ok(a.insights.terms.length >= 1);
+  assert.ok(a.insights.ratios.length >= 1);
+  assert.ok(a.insights.rules.length >= 1);
+  assert.ok(a.insights.collateralDocs.length >= 1);
+  assert.ok(a.actions.some(x => x.severity === 'critical'), 'Should detect prohibition as critical action');
+
+  const r = a.extractedRules;
+  assert.strictEqual(r.maxAmountBn, 200);
+  assert.strictEqual(r.branchAuthBn, 30);
+  assert.strictEqual(r.ratePct, 21);
+  assert.strictEqual(r.maxMonths, 36);
+  assert.strictEqual(r.graceMonths, 6);
+  assert.strictEqual(r.avgMultiplier, 3);
+  assert.strictEqual(r.avgSeasonMonths, 2);
+  assert.ok(r.allowedRatings.includes('B2'));
+  assert.ok(a.crossImpact.paramDeltas.length >= 1, 'Should detect rate/branchAuth deltas vs active params');
+});
+
+test('answerSuperQuestion provides accurate grounded answers with page citations', () => {
+  const a = superPdf.analyzeSuperCircular(superPdf.SAMPLE_CIRCULAR_TEXT);
+  const q1 = superPdf.answerSuperQuestion(a, 'نرخ سود تسهیلات چند درصد است؟');
+  assert.strictEqual(q1.verdict, 'direct');
+  assert.ok(q1.shortAnswer.includes('۲۱'), 'Expected ۲۱ in shortAnswer, got: ' + q1.shortAnswer);
+  assert.strictEqual(q1.mainClause.page, 1);
+
+  const q2 = superPdf.answerSuperQuestion(a, 'حداکثر مدت بازپرداخت چند ماه است؟');
+  assert.strictEqual(q2.verdict, 'direct');
+  assert.ok(q2.shortAnswer.includes('۳۶'), 'Expected ۳۶ in shortAnswer, got: ' + q2.shortAnswer);
+  assert.strictEqual(q2.mainClause.page, 2);
+
+  const q3 = superPdf.answerSuperQuestion(a, 'حد اختیار رئیس شعبه چقدر است؟');
+  assert.strictEqual(q3.verdict, 'direct');
+  assert.ok(q3.shortAnswer.includes('۳۰'), 'Expected ۳۰ in shortAnswer, got: ' + q3.shortAnswer);
+});
+
+test('evaluateCaseAgainstCircular evaluates compliant and non-compliant customer cases', () => {
+  const a = superPdf.analyzeSuperCircular(superPdf.SAMPLE_CIRCULAR_TEXT);
+
+  const good = superPdf.evaluateCaseAgainstCircular(a, {
+    custName: 'شرکت پیشرو صنعت',
+    ptype: 'legal',
+    amount: 25,
+    rating: 'B1',
+    avgAmt: 10,
+    avgMonths: 3,
+    term: 24,
+    bouncedCheque: false,
+    overdue: false
+  });
+  assert.strictEqual(good.verdict, 'ok');
+  assert.ok(good.predictedAuth.includes('شعبه'));
+  assert.ok(good.customerReplyText.includes('پیشرو صنعت'));
+
+  const bad = superPdf.evaluateCaseAgainstCircular(a, {
+    custName: 'شرکت پرریسک',
+    ptype: 'legal',
+    amount: 250,
+    rating: 'C2',
+    avgAmt: 20,
+    avgMonths: 1,
+    term: 48,
+    bouncedCheque: true,
+    overdue: false
+  });
+  assert.strictEqual(bad.verdict, 'bad');
+  assert.ok(bad.recommendations.length >= 3);
+  assert.ok(bad.internalMemoText.includes('مغایر'));
 });
 
 console.log(`\nResult: ${passed} passed, ${failed} failed.`);
